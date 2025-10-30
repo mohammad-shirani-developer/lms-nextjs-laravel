@@ -3,11 +3,13 @@ import { Tabs } from "@/components/ui/tabs";
 import { VideoPlayer } from "@/components/video-player";
 import { API_URL } from "@/config/global";
 import { AccordionType } from "@/types/accordion.type";
+import { CourseChapter } from "@/types/course-chapter.interface";
 import { CourseDetails } from "@/types/course-detail.interface";
 import { Tab } from "@/types/tab.type";
 import Image from "next/image";
 import CourseComments from "./components/comments/CourseComments";
 import CourseAside from "./components/course-aside/CourseAside";
+import { CourseCurriculum } from "./components/curriculum";
 
 // Generate static params for dynamic routes
 export async function generateStaticParams() {
@@ -20,19 +22,24 @@ export async function generateStaticParams() {
   }));
 }
 
-// Fetch course details by slug
-async function getCourseDetails(slug: string) {
+async function getCourse(slug: string): Promise<CourseDetails> {
   const res = await fetch(`${API_URL}/courses/${slug}`);
   return res.json();
 }
 
-const CourseDetail = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug } = await params;
-  const course: CourseDetails = await getCourseDetails(slug);
+async function getCurriculum(slug: string): Promise<CourseChapter[]> {
+  const res = await fetch(`${API_URL}/courses/${slug}/curriculum`);
+  return res.json();
+}
+
+const CourseDetail = async ({ params }: { params: { slug: string } }) => {
+  const { slug } = params;
+  const courseData = getCourse(slug);
+  const CourseCurriculumData = getCurriculum(slug);
+  const [course, courseCurriculum] = await Promise.all([
+    courseData,
+    CourseCurriculumData,
+  ]);
 
   const faqs: AccordionType[] = course.frequentlyAskedQuestions.map((faq) => ({
     id: faq.id,
@@ -86,10 +93,10 @@ const CourseDetail = async ({
       <div className="col-span-10 xl:col-span-6">
         <Tabs tabs={tabs} />
       </div>
-      <div className="col-span-10 xl:col-span-4 bg-amber-100">
+      <div className="col-span-10 xl:col-span-4">
         <div className="sticky top-5">
           <h2 className="mb-5 text-xl">سرفصل های دوره</h2>
-          {/* <CourseCurriculum data={courseCurriculum} /> */}
+          <CourseCurriculum data={courseCurriculum} />
         </div>
       </div>
     </div>

@@ -56,7 +56,7 @@ const Avatar = ({
         <IconUserProfile
           width={sizePx / 2}
           height={sizePx / 2}
-          className="opacity-40"
+          className="opacity-50 text-primary"
         />
       )}
     </div>

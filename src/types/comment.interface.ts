@@ -6,5 +6,6 @@ export interface Comment {
   commentText: string;
   score?: number | null;
   isResponse: boolean;
+  avatarUrl: string;
   replies?: Comment[]; // ✅ اضافه شد
 }
